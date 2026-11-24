@@ -8,6 +8,7 @@ import { internalAuth } from './middleware/internalAuth.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { createPlacementRouter } from './routes/placement.js';
 import { createRoutingRouter } from './routes/routing.js';
+import { ensureDatabase } from './db/bootstrap.js';
 
 export function createApp(db: Database.Database): Express {
   const app = express();
@@ -28,6 +29,7 @@ const isMain = process.argv[1] && (
 );
 
 if (isMain) {
+  ensureDatabase(config.WAREHOUSE_DB_PATH);
   const db = new Database(config.WAREHOUSE_DB_PATH, { readonly: true });
   db.pragma('busy_timeout = 5000');
 

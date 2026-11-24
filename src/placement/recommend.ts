@@ -24,6 +24,7 @@ export interface ScoredCandidate {
   can_fit_full: boolean;
   suggested_qty: number;
   distance: number;
+  distance_unit: 'm';
   score: number;
   breakdown: FactorBreakdown[];
   reason: string;
@@ -76,7 +77,7 @@ function buildReasonText(
   } else {
     const topFactor = sorted[0];
     if (topFactor.factor === 'distance') {
-      parts.push(`Shortest distance from receiving (${dist.toFixed(1)} units)`);
+      parts.push(`Shortest distance from receiving (${dist.toFixed(1)} m)`);
     } else if (topFactor.factor === 'utilization') {
       parts.push('High capacity utilization');
     } else if (topFactor.factor === 'affinity') {
@@ -86,7 +87,7 @@ function buildReasonText(
     }
   }
 
-  parts.push(`${dist.toFixed(1)} distance units from receiving`);
+  parts.push(`${dist.toFixed(1)} m from receiving`);
   return parts.join('; ') + '.';
 }
 
@@ -203,6 +204,7 @@ export function recommendPlacement(
       can_fit_full: filterRes.can_fit_full,
       suggested_qty: filterRes.suggested_qty,
       distance: dist,
+      distance_unit: 'm',
       score: scoreRes.score,
       breakdown: scoreRes.breakdown,
       reason: buildReasonText(scoreRes.breakdown, dist, filterRes.can_fit_full, isConsolidation)
@@ -271,7 +273,16 @@ export function recommendPlacement(
 
   return {
     requested_qty: qty,
-    generated_at: new Date().toISOString(),
+    generated_at: new Date().toLocaleString('en-IN', {
+  timeZone: 'Asia/Kolkata',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+  hour12: true
+}) + ' IST',
     scoring: scoringMeta,
     recommended,
     alternatives,
